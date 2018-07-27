@@ -173,7 +173,7 @@ void TabEditor::paintEvent(QPaintEvent *)
                 if (!note->isEmpty()) {
                     int y = PADDING + line * (STAFF_HEIGHT + LINE_SPACING) + j * STRING_SPACING;
                     QRect textRect = QRect(x - FONT_SIZE / 2, y - FONT_SIZE / 2, FONT_SIZE, FONT_SIZE);
-                    p.fillRect(textRect, QBrush(QColor(Qt::white)));
+                    p.fillRect(textRect, whiteBrush);
                     p.drawText(textRect, Qt::AlignCenter, QString::number(note->value));
 
                     QRect hRect;
