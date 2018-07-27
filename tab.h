@@ -7,6 +7,7 @@
 
 enum NoteModifier {
     None,
+    HammerOn
 };
 
 class Note

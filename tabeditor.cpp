@@ -60,10 +60,84 @@ TabEditor::TabEditor(QWidget *parent) : QWidget(parent)
                 Note::empty(),
                 Note::empty(),
                 new Note(0),
+                Note::empty(),
+                Note::empty(),
+                Note::empty()
+            }),
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
                 new Note(2),
+                Note::empty(),
+                Note::empty()
+            }),
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
                 new Note(3),
+                Note::empty()
+            }),
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
                 new Note(2)
             }),
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                new Note(0)
+            }),
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                new Note(3),
+                Note::empty()
+            }),
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                new Note(2),
+                Note::empty(),
+                Note::empty()
+            }),
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+                new Note(3),
+                Note::empty()
+            })
+        }),
+        new Measure({
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                new Note(0),
+                new Note(0),
+                Note::empty(),
+                Note::empty()
+            }),
+            new Chord({
+                Note::empty(),
+                Note::empty(),
+                new Note(2, NoteModifier::HammerOn),
+                Note::empty(),
+                Note::empty(),
+                Note::empty(),
+            })
         })
     });
 }
@@ -72,7 +146,9 @@ void TabEditor::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     QSize s = size();
-    p.fillRect(0, 0, s.width(), s.height(), QBrush(QColor(Qt::white)));
+    QBrush whiteBrush = QBrush(QColor(Qt::white));
+
+    p.fillRect(0, 0, s.width(), s.height(), whiteBrush);
 
     p.setPen(QColor(Qt::black));
 
@@ -91,13 +167,25 @@ void TabEditor::paintEvent(QPaintEvent *)
 
     for (Measure *measure : tab->measures) {
         for (int i = 0; i < measure->chords.size(); i++) {
+            Chord *chord = measure->chords.at(i);
             for (int j = 0; j < N_STRINGS; j++) {
-                Note *note = measure->chords.at(i)->notes.at(N_STRINGS - j - 1);
+                Note *note = chord->notes.at(N_STRINGS - j - 1);
                 if (!note->isEmpty()) {
                     int y = PADDING + line * (STAFF_HEIGHT + LINE_SPACING) + j * STRING_SPACING;
                     QRect textRect = QRect(x - FONT_SIZE / 2, y - FONT_SIZE / 2, FONT_SIZE, FONT_SIZE);
                     p.fillRect(textRect, QBrush(QColor(Qt::white)));
                     p.drawText(textRect, Qt::AlignCenter, QString::number(note->value));
+
+                    QRect hRect;
+                    switch (note->modifier) {
+                    case NoteModifier::HammerOn:
+                        hRect = QRect(x - NOTE_SPACING + FONT_SIZE / 2, y - FONT_SIZE / 2, FONT_SIZE / 2, FONT_SIZE);
+                        p.fillRect(hRect, whiteBrush);
+                        p.drawText(hRect, Qt::AlignCenter, QString("h"));
+                        break;
+                    case NoteModifier::None:
+                        break;
+                    }
                 }
             }
 
