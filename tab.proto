@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package tably;
+
+enum NoteModifier {
+    None = 0;
+    HammerOn = 1;
+}
+
+message Note {
+    optional int32 value = 1 [default = -1];
+    optional NoteModifier modifier = 2 [default = None];
+}
+
+message Chord {
+    repeated Note notes = 1;
+}
+
+message Measure {
+    repeated Chord chords = 1;
+}
+
+message Tab {
+    repeated Measure measures = 1;
+}

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,20 +22,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += /usr/local/include
+
+LIBS += -L/usr/local/lib/ -lprotobuf
+
+PROTOS = tab.proto
+include("build/protobuf.pri")
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
+    main.cpp \
+    mainwindow.cpp \
     tabeditor.cpp \
-    tab.cpp
 
 HEADERS += \
-        mainwindow.h \
+    mainwindow.h \
     tabeditor.h \
-    tab.h
 
 FORMS += \
-        mainwindow.ui
+    mainwindow.ui
 
 DISTFILES += \
-    README.md
+    README.md \
+    build/protobuf.pri

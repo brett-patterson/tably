@@ -2,7 +2,9 @@
 #define TABEDITOR_H
 
 #include <QWidget>
-#include "tab.h"
+#include "tab.pb.h"
+
+using namespace tably;
 
 class TabEditor : public QWidget
 {

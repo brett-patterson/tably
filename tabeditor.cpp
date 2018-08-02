@@ -1,4 +1,9 @@
 #include <QPainter>
+#include <QDebug>
+#include <QDir>
+
+#include <iostream>
+#include <fstream>
 
 #include "tabeditor.h"
 
@@ -10,136 +15,19 @@
 #define NOTE_SPACING 15
 #define FONT_SIZE 10
 
+
+using namespace std;
+using namespace tably;
+
+
 TabEditor::TabEditor(QWidget *parent) : QWidget(parent)
 {
-    this->tab = new Tab({
-        new Measure({
-            new Chord({
-                new Note(3),
-                new Note(2),
-                new Note(0),
-                new Note(0),
-                new Note(3),
-                new Note(3)
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(3)
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(3),
-                Note::empty()
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(0),
-                Note::empty(),
-                Note::empty()
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(3),
-                Note::empty()
-            }),
-        }),
-        new Measure({
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                new Note(0),
-                Note::empty(),
-                Note::empty(),
-                Note::empty()
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(2),
-                Note::empty(),
-                Note::empty()
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(3),
-                Note::empty()
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(2)
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(0)
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(3),
-                Note::empty()
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(2),
-                Note::empty(),
-                Note::empty()
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-                new Note(3),
-                Note::empty()
-            })
-        }),
-        new Measure({
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                new Note(0),
-                new Note(0),
-                Note::empty(),
-                Note::empty()
-            }),
-            new Chord({
-                Note::empty(),
-                Note::empty(),
-                new Note(2, NoteModifier::HammerOn),
-                Note::empty(),
-                Note::empty(),
-                Note::empty(),
-            })
-        })
-    });
+    fstream input("/Users/brett/code/tably/test.tab", ios::in | ios::binary);
+    this->tab = new Tab();
+    this->tab->ParseFromIstream(&input);
+
+//    fstream f("test.tab", std::ios::out | std::ios::trunc | std::ios::binary);
+//    tab->SerializeToOstream(&f);
 }
 
 void TabEditor::paintEvent(QPaintEvent *)
@@ -163,21 +51,24 @@ void TabEditor::paintEvent(QPaintEvent *)
 
     drawStaff(&p, line);
 
-    int cellsPerLine = (s.width() - 2 * PADDING) / (FONT_SIZE + NOTE_SPACING);
+    int cellsPerLine = (s.width() - 2 * PADDING) / (NOTE_SPACING);
 
-    for (Measure *measure : tab->measures) {
-        for (int i = 0; i < measure->chords.size(); i++) {
-            Chord *chord = measure->chords.at(i);
-            for (int j = 0; j < N_STRINGS; j++) {
-                Note *note = chord->notes.at(N_STRINGS - j - 1);
-                if (!note->isEmpty()) {
-                    int y = PADDING + line * (STAFF_HEIGHT + LINE_SPACING) + j * STRING_SPACING;
+    qDebug() << "Cells per line:" << cellsPerLine << "(w:" << s.width() << "p:" << PADDING << "f:" << FONT_SIZE << "n:" << NOTE_SPACING << ")";
+
+    for (int i = 0; i < tab->measures_size(); i++) {
+        const Measure& measure = tab->measures(i);
+        for (int j = 0; j < measure.chords_size(); j++) {
+            const Chord& chord = measure.chords(j);
+            for (int k = 0; k < N_STRINGS; k++) {
+                const Note& note = chord.notes(N_STRINGS - k - 1);
+                if (note.value() >= 0) {
+                    int y = PADDING + line * (STAFF_HEIGHT + LINE_SPACING) + k * STRING_SPACING;
                     QRect textRect = QRect(x - FONT_SIZE / 2, y - FONT_SIZE / 2, FONT_SIZE, FONT_SIZE);
                     p.fillRect(textRect, whiteBrush);
-                    p.drawText(textRect, Qt::AlignCenter, QString::number(note->value));
+                    p.drawText(textRect, Qt::AlignCenter, QString::number(note.value()));
 
                     QRect hRect;
-                    switch (note->modifier) {
+                    switch (note.modifier()) {
                     case NoteModifier::HammerOn:
                         hRect = QRect(x - NOTE_SPACING + FONT_SIZE / 2, y - FONT_SIZE / 2, FONT_SIZE / 2, FONT_SIZE);
                         p.fillRect(hRect, whiteBrush);
@@ -217,4 +108,5 @@ void TabEditor::drawStaff(QPainter *p, int index) {
 
 TabEditor::~TabEditor()
 {
+    delete tab;
 }
