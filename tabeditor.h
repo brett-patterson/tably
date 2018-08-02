@@ -23,7 +23,7 @@ public slots:
 private:
     Tab *tab;
 
-    void drawStaff(QPainter *p, int index);
+    void drawStaff(QPainter &p, int index);
 };
 
 #endif // TABEDITOR_H

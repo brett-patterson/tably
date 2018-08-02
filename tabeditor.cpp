@@ -7,6 +7,9 @@
 
 #include "tabeditor.h"
 
+using namespace std;
+using namespace tably;
+
 #define PADDING 10
 #define N_STRINGS 6
 #define STRING_SPACING 10
@@ -14,11 +17,6 @@
 #define STAFF_HEIGHT ((N_STRINGS - 1) * STRING_SPACING)
 #define NOTE_SPACING 15
 #define FONT_SIZE 10
-
-
-using namespace std;
-using namespace tably;
-
 
 TabEditor::TabEditor(QWidget *parent) : QWidget(parent)
 {
@@ -46,14 +44,8 @@ void TabEditor::paintEvent(QPaintEvent *)
 
     int line = 0;
     int x = PADDING;
-    int measureOnLine = 0;
-    int chordsOnLine = 0;
 
-    drawStaff(&p, line);
-
-    int cellsPerLine = (s.width() - 2 * PADDING) / (NOTE_SPACING);
-
-    qDebug() << "Cells per line:" << cellsPerLine << "(w:" << s.width() << "p:" << PADDING << "f:" << FONT_SIZE << "n:" << NOTE_SPACING << ")";
+    drawStaff(p, line);
 
     for (int i = 0; i < tab->measures_size(); i++) {
         const Measure& measure = tab->measures(i);
@@ -82,27 +74,24 @@ void TabEditor::paintEvent(QPaintEvent *)
 
             x += NOTE_SPACING;
 
-            if (++chordsOnLine + measureOnLine == cellsPerLine) {
-                drawStaff(&p, ++line);
-                measureOnLine = 0;
-                chordsOnLine = 0;
+            if (x >= s.width() - PADDING) {
+                drawStaff(p, ++line);
                 x = PADDING;
             }
         }
 
         p.drawLine(x, PADDING + line * (STAFF_HEIGHT + LINE_SPACING), x, PADDING + line * (STAFF_HEIGHT + LINE_SPACING) + STAFF_HEIGHT);
-        measureOnLine++;
         x += NOTE_SPACING;
     }
 
 }
 
-void TabEditor::drawStaff(QPainter *p, int index) {
+void TabEditor::drawStaff(QPainter &p, int index) {
     QSize s = size();
 
     for (int j = 0; j < N_STRINGS; j++) {
         int y = PADDING + index * (STAFF_HEIGHT + LINE_SPACING) + j * STRING_SPACING;
-        p->drawLine(PADDING, y, s.width() - PADDING, y);
+        p.drawLine(PADDING, y, s.width() - PADDING, y);
     }
 }
 
