@@ -11,6 +11,7 @@ class TabEditor : public QWidget
     Q_OBJECT
 public:
     explicit TabEditor(QWidget *parent = nullptr);
+    void setTab(Tab *tab);
     ~TabEditor();
 
 protected:
@@ -23,7 +24,12 @@ public slots:
 private:
     Tab *tab;
 
+    void drawMeasures(QPainter &p);
     void drawStaff(QPainter &p, int index);
+    void drawChord(QPainter &p, const Chord& chord, int x, int line);
+    void drawNote(QPainter &p, const Note& note, int x, int line);
+
+    int staffHeight();
 };
 
 #endif // TABEDITOR_H

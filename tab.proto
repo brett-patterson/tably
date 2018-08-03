@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package tably;
 
@@ -8,8 +8,9 @@ enum NoteModifier {
 }
 
 message Note {
-    optional int32 value = 1 [default = -1];
-    optional NoteModifier modifier = 2 [default = None];
+    int32 string = 1;
+    int32 value = 2;
+    NoteModifier modifier = 3;
 }
 
 message Chord {
@@ -21,5 +22,6 @@ message Measure {
 }
 
 message Tab {
-    repeated Measure measures = 1;
+    repeated string strings = 1;
+    repeated Measure measures = 2;
 }
